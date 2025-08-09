@@ -4,15 +4,27 @@
 
 PARTE 1: <a href="#fluxo-desenvolvimento-integracao" style="font-weight: bold">Melhorando o Fluxo de Desenvolvimento e Integração da Equipe</a>
 
+1.1 <a href="#fluxo-trabalho">O Fluxo de Trabalho</a>
+
 - <a href="#padronizacao-projetos">Padronização de Projetos</a>
 - <a href="#comandos-docker">Comandas Docker</a>
+
+1.2 <a href="#trabalhando-feat">Trabalhando em uma Feat</a>
+
 - <a href="#github-actions">Github Actions</a>
+- <a href="#add-test">Adicionando Testes</a>
+
+1.3 <a href="#Workflows-projeto">Workflows de Projeto</a>
+
+- <a href="#trabalhando-branchs">Trabalhando com Branches</a>
 
 ---
 
 # <p id="fluxo-desenvolvimento-integracao">Melhorando o Fluxo de Desenvolvimento e Integração da Equipe</p>
 
-## <p id="padronizacao-projetos">Padronização de Projetos</p>
+## <p id="fluxo-trabalho">O Fluxo de Trabalho</p>
+
+### <p id="padronizacao-projetos">Padronização de Projetos</p>
 
 | **ESQUEMA CI/CD - INTEGRAÇÃO CONTINUA** |
 |-----------------------------------------|
@@ -32,7 +44,7 @@ PARTE 1: <a href="#fluxo-desenvolvimento-integracao" style="font-weight: bold">M
 _Nota: flag --fix buscar resolver todos os problemas de código._
 - `"lint": "eslint --fix --ignore-path .gitignore ."`
 
-## <p id="comandos-docker">Comandas Docker</p>
+### <p id="comandos-docker">Comandas Docker</p>
 
 ```bash
 # FAZ BUILD E SOBE SERVIÇO ESCOLHIDO NO DOCKER-COMPOSE
@@ -62,9 +74,13 @@ docker rm -f $(docker ps -a -q)
 sudo docker exec -it <id do container> sh
 ```
 
-## <p id="github-actions">Github Actions</p>
+## <p id="trabalhando-feat">Trabalhando em uma Feat</p>
+
+### <p id="github-actions">Github Actions</p>
 
 ```yml
+# VERIFICAÇÕES DE CI
+
 name: pre-push
 # DISPAROS PARA INICIAR AS ACTIONS
 on:
@@ -112,5 +128,55 @@ jobs:
         run: npm test
 
 ```
+
+### <p id="#add-test">Adicionando Testes</p>
+
+```javascript
+/**
+ * Teste para verificar se a API retorna corretamente uma lista de livros de um autor específico.
+ */
+it('Deve retornar uma lista de livros', (done) => {
+  // Define o ID do autor que será usado na requisição
+  const autorId = 1;
+
+  // Inicia uma requisição HTTP GET para o endpoint que retorna os livros de um autor
+  chai.request(app)
+    .get(`/autores/${autorId}/livros`) // Endpoint da API para buscar livros de um autor específico
+    .set('Accept', 'application/json') // Define o cabeçalho para aceitar respostas em JSON
+    .end((err, res) => { // Callback executado quando a resposta chega
+      // Verifica se o status HTTP da resposta é 200 (OK)
+      expect(res.status).to.equal(200);
+
+      // Verifica se o corpo da resposta possui a propriedade 'autor'
+      expect(res.body).to.have.property('autor');
+
+      // Verifica se o corpo da resposta possui a propriedade 'livros'
+      expect(res.body).to.have.property('livros');
+
+      // Verifica se a propriedade 'livros' é um array
+      expect(res.body.livros).to.be.an('array');
+
+      // Indica que o teste terminou
+      done();
+    });
+});
+```
+
+### Extra: Camadas de Segurança no Repositório
+
+| **Etapas de Configuração** |
+|----------------------------|
+
+```bash
+-| <repositorio_projeto>
+ |--| settings
+    |--| Branches
+```
+
+## <p id="Workflows-projeto">Workflows de Projeto</p>
+
+### <p id="trabalhando-branchs">Trabalhando com Branches</p>
+
+**FEATURE BRANCHING** - ramo é criado para focar uma única feature.
 
 <a href="#sumario">Retornar ao sumário</a>
